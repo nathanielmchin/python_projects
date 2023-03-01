@@ -38,8 +38,8 @@ class Card():
         self._suit = suit
         self._value = value
     
-    def get_card(self):
-        return [self._code, self._suit, self._value]
+    # def get_card(self):
+    #     return [self._code, self._suit, self._value]
     def get_code(self):
         return self._code
     def get_suit(self):
@@ -48,7 +48,7 @@ class Card():
         return self._value
     
     def show(self):
-        print (self.get_card())
+        print(f"{[self._code, self._suit, self._value]}")
 
 class Deck():
     def __init__(self):
@@ -80,6 +80,7 @@ class Player():
 
     def draw_card(self, deck):
         self._cards.append(deck._cards.pop())
+    
     def show_hand(self):
         for i in range(len(self._cards)):
             self._cards[i].show()
@@ -89,6 +90,12 @@ class Player():
     def show(self):
         print("{} has a value of: {}".format(self._name, self.get_hand_value()))
         self.show_hand()
+    
+    def get_card(self, i):
+        if i >= (len(self._cards) - 1) or i < 0:
+            return None
+        else:
+            return self._cards[i]
     def get_hand_value(self):
         sum = 0
         ace_count = 0
@@ -100,7 +107,6 @@ class Player():
         for i in range(ace_count):
             if sum > 21:
                 sum -= 10
-
         return sum
 
 def play_blackjack():
@@ -131,21 +137,25 @@ def play_blackjack():
 
     dealer = Player("Dealer")
     player = Player("Player1")
+    
+    dealer.draw_card(deck)
+    player.draw_card(deck)
+    dealer.draw_card(deck)
+    player.draw_card(deck)
 
-    dealer.draw_card(deck)
-    player.draw_card(deck)
-    dealer.draw_card(deck)
-    player.draw_card(deck)
+    if player.get_hand_value() == 21:
+        if dealer.get_hand_value() == 21:
+            return "Push"
+        else:
+            while dealer.get_hand_value() < 21:
+                dealer.draw_card()
+    # elif player.get_hand_value() < 21:
+    #     if dealer.
 
     player.show()
     dealer.show_upcard()
 
     evaluate_winner(player, dealer)
-        
-
-    
-
-
 
 play_blackjack()
 
