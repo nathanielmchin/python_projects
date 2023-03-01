@@ -169,7 +169,7 @@ def play_blackjack():
     if player.get_hand_value() == 21:
         # also need to implement insurance for here
         if dealer.get_hand_value() == 21:
-            pass
+            pass # i wonder if this works.
         else:
             while dealer.get_hand_value() < 21:
                 dealer.draw_card(deck)
@@ -178,7 +178,7 @@ def play_blackjack():
             # offer insurance
             print('would offer insurance to you but o well.')
             if dealer.get_hand_value() == 21:
-                pass # exit this logic and evaluate the hands. the player should lose
+                pass # exit this logic and evaluate the hands. the player should lose. I wonder if this works.
         if dealer.get_hand_value() < 21:
             response = None
             disable_double = False
@@ -195,7 +195,8 @@ def play_blackjack():
                     disable_double = True
                     player.draw_card(deck)
                     player.show()
-            if player.get_hand_value() > 21: # the dealer does not hit if the player busts
+            # The dealer does not hit if the player busts
+            if player.get_hand_value() > 21: 
                 pass
             else:
                 # Dealer's turn. Dealer hits soft serves
