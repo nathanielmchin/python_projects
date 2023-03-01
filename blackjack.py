@@ -53,11 +53,11 @@ class Card():
 class Deck():
     def __init__(self):
         self._cards = []
-    def build(self, deck_template):
-        for suit in ['Clubs', 'Hearts', 'Spades', 'Diamonds']:
-            for dt in deck_template:
-                card = Card(dt, suit, deck_template[dt])
-                self._cards.append(card)
+    # def build(self, deck_template): # python does not support function overloading 
+    #     for suit in ['Clubs', 'Hearts', 'Spades', 'Diamonds']:
+    #         for dt in deck_template:
+    #             card = Card(dt, suit, deck_template[dt])
+    #             self._cards.append(card)
     def build(self, deck_template, num):
         for i in range(num):
             for suit in ['Clubs', 'Hearts', 'Spades', 'Diamonds']:
@@ -84,18 +84,24 @@ class Player():
     def show_hand(self):
         for i in range(len(self._cards)):
             self._cards[i].show()
-    def show_upcard(self):
-        print("{} has an upcard of".format(self._name))
-        self._cards[0].show() 
+    # def show_card(self): # python does not support function overloading
+    #     print("{} has an upcard of".format(self._name))
+    #     self._cards[0].show()
+    def show_card(self, i):
+        if i >= (len(self._cards) - 1) or i < 0:
+            return None
+        else:
+            print("{} has an upcard of".format(self._name))
+            self._cards[0].show() 
     def show(self):
         print("{} has a value of: {}".format(self._name, self.get_hand_value()))
         self.show_hand()
     
-    def get_card(self, i):
-        if i >= (len(self._cards) - 1) or i < 0:
-            return None
-        else:
-            return self._cards[i]
+    # def get_card(self, i):
+    #     if i >= (len(self._cards) - 1) or i < 0:
+    #         return None
+    #     else:
+    #         return self._cards[i]
     def get_hand_value(self):
         sum = 0
         ace_count = 0
@@ -132,7 +138,7 @@ def play_blackjack():
     
     # Create the deck
     deck = Deck()
-    deck.build(deck_template_Aced,5)
+    deck.build(deck_template_Aced, 5)
     deck.shuffle()
 
     dealer = Player("Dealer")
@@ -148,12 +154,12 @@ def play_blackjack():
             return "Push"
         else:
             while dealer.get_hand_value() < 21:
-                dealer.draw_card()
+                dealer.draw_card(deck)
     # elif player.get_hand_value() < 21:
     #     if dealer.
 
     player.show()
-    dealer.show_upcard()
+    dealer.show_card(0)
 
     evaluate_winner(player, dealer)
 
