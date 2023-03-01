@@ -34,61 +34,68 @@ deck_template_Aced = {
 
 class Card():
     def __init__(self, code, suit, value):
-        self.code = code
-        self.suit = suit
-        self.value = value
-    def card(self):
-        return [self.code, self.suit, self.value]
+        self._code = code
+        self._suit = suit
+        self._value = value
+    
+    def get_card(self):
+        return [self._code, self._suit, self._value]
+    def get_code(self):
+        return self._code
+    def get_suit(self):
+        return self._suit
+    def get_value(self):
+        return self._value
+    
     def show(self):
-        print (self.card())
+        print (self.get_card())
 
 class Deck():
     def __init__(self):
-        self.cards = []
+        self._cards = []
     def build(self, deck_template):
         for suit in ['Clubs', 'Hearts', 'Spades', 'Diamonds']:
             for dt in deck_template:
                 card = Card(dt, suit, deck_template[dt])
-                self.cards.append(card)
+                self._cards.append(card)
     def build(self, deck_template, num):
         for i in range(num):
             for suit in ['Clubs', 'Hearts', 'Spades', 'Diamonds']:
                 for dt in deck_template:
                     card = Card(dt, suit, deck_template[dt])
-                    self.cards.append(card)
+                    self._cards.append(card)
     def show(self):
-        for i in range(len(self.cards)):
-            self.cards[i].show()
+        for i in range(len(self._cards)):
+            self._cards[i].show()
     def shuffle(self):
-        for i in range(len(self.cards) - 1, 0, -1):
+        for i in range(len(self._cards) - 1, 0, -1):
             r = random.randint(0, i)
-            self.cards[i], self.cards[r] = self.cards[r], self.cards[i]
+            self._cards[i], self._cards[r] = self._cards[r], self._cards[i]
         
 # This model does not support splits. we would need to implement multiple hands
 class Player(): 
     def __init__(self, name):
-        self.name = name
-        self.cards = []
+        self._name = name
+        self._cards = []
+
     def draw_card(self, deck):
-        self.cards.append(deck.cards.pop())
+        self._cards.append(deck._cards.pop())
     def show_hand(self):
-        for i in range(len(self.cards)):
-            self.cards[i].show()
+        for i in range(len(self._cards)):
+            self._cards[i].show()
     def show_upcard(self):
-        print("{} has an upcard of".format(self.name))
-        self.cards[0].show()
-        # self.cards[0].show()
-        
+        print("{} has an upcard of".format(self._name))
+        self._cards[0].show() 
     def show(self):
-        print("{} has a value of: {}".format(self.name, self.hand_value()))
+        print("{} has a value of: {}".format(self._name, self.get_hand_value()))
         self.show_hand()
-    def hand_value(self):
+    def get_hand_value(self):
         sum = 0
         ace_count = 0
-        for i in range(len(self.cards)):
-            if self.cards[i].code == 'Ace':
+        for i in range(len(self._cards)):
+            if self._cards[i]._code == 'Ace':
                 ace_count += 1
-            sum += self.cards[i].value            
+            sum += self._cards[i].get_value()
         # Subtract 10 for each ace until the count is below 21 or until were out of Aces to subtract
         for i in range(ace_count):
             if sum > 21:
@@ -99,18 +106,18 @@ class Player():
 def play_blackjack():
     
     def evaluate_winner(player, dealer):
-        if player.hand_value() > 21 and dealer.hand_value() > 21: # this should never happen, right? the dealer wouldn't hit if the player already busts
+        if player.get_hand_value() > 21 and dealer.get_hand_value() > 21: # this should never happen, right? the dealer wouldn't hit if the player already busts
             return "Dealer"
-        elif player.hand_value() > 21 and dealer.hand_value() <= 21:
+        elif player.get_hand_value() > 21 and dealer.get_hand_value() <= 21:
             return "Dealer"
-        elif player.hand_value() <= 21 and dealer.hand_value() > 21:
+        elif player.get_hand_value() <= 21 and dealer.get_hand_value() > 21:
             return "Player"
-        elif player.hand_value() < 21 and dealer.hand_value() < 21:
-            if player.hand_value() > dealer.hand_value():
+        elif player.get_hand_value() < 21 and dealer.get_hand_value() < 21:
+            if player.get_hand_value() > dealer.get_hand_value():
                 return "Player"
-            elif player.hand_value() < dealer.hand_value():
+            elif player.get_hand_value() < dealer.get_hand_value():
                 return "Dealer"
-            elif player.hand_value() == dealer.hand_value():
+            elif player.get_hand_value() == dealer.get_hand_value():
                 return "Push"
             else:
                 return "Where are we (inner)?"
@@ -132,7 +139,6 @@ def play_blackjack():
 
     player.show()
     dealer.show_upcard()
-
 
     evaluate_winner(player, dealer)
         
