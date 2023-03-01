@@ -89,15 +89,12 @@ class Player():
     def show_hand(self):
         for i in range(len(self._cards)):
             self._cards[i].show()
-    # def show_card(self): # python does not support function overloading
-    #     print("{} has an upcard of".format(self._name))
-    #     self._cards[0].show()
-    def show_card(self, i):
+    def show_card(self, i = 0):
         if i >= (len(self._cards) - 1) or i < 0:
             return None
         else:
             print("{} has an upcard of".format(self._name))
-            self._cards[0].show() 
+            self._cards[i].show() 
     def show(self):
         print("{} has a value of: {}".format(self._name, self.get_hand_value()))
         self.show_hand()
