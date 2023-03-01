@@ -1,4 +1,5 @@
 import random
+import time
 
 deck_template_standard = {
     'Ace'   : 11
@@ -111,6 +112,8 @@ class Player():
         for i in range(len(self._cards)):
             if self._cards[i]._code == 'Ace':
                 ace_count += 1
+            # print(f"looking at card:") 
+            # self._cards[i].show()
             sum += self._cards[i].get_value()
         # Subtract 10 for each ace until the count is below 21 or until were out of Aces to subtract
         for i in range(ace_count):
@@ -128,7 +131,7 @@ def play_blackjack():
             return "Dealer"
         elif player.get_hand_value() <= 21 and dealer.get_hand_value() > 21: # dealer busts
             return "Player"
-        elif player.get_hand_value() < 21 and dealer.get_hand_value() < 21: # neither bust
+        elif player.get_hand_value() <= 21 and dealer.get_hand_value() <= 21: # neither bust
             if player.get_hand_value() > dealer.get_hand_value():
                 return "Player"
             elif player.get_hand_value() < dealer.get_hand_value():
@@ -158,7 +161,7 @@ def play_blackjack():
 
     # Reveal the drawn cards, 2 for the player and an upcard for the dealer
     player.show()
-    dealer.show_card(0)
+    dealer.show_card()
 
     # Decision time, based on the drawn and shown cards
     # if dealer.get_card().get_value() == 11:
@@ -179,7 +182,7 @@ def play_blackjack():
         if dealer.get_hand_value() < 21:
             response = None
             while player.get_hand_value() < 21 and response != '3':
-                response = input("(1) hit, (2) double, (3) stand: ")
+                response = input("(1) hit, (2) double, (3) stand: ") # player should not be able to double down after hitting. also need to incorporate splitting at some point.
                 if response == '1':
                     player.draw_card(deck)
                     player.show()
@@ -187,13 +190,21 @@ def play_blackjack():
                     player.draw_card(deck)
                     player.show()
                     break
-            print("testing")
+            # Dealer hits soft serves
             while dealer.get_hand_value() <= 17:
-                if dealer.find_card('Ace') == True and dealer.get_hand_value() == 17:
-                    dealer.draw_card(deck)
+                if dealer.get_hand_value() == 17:
+                    if dealer.find_card('Ace') == True:
+                        dealer.draw_card(deck)
+                    else:
+                        break
                 if dealer.get_hand_value() < 17:
                     dealer.draw_card(deck)
-            
+                    print({dealer.show()})
+                else: 
+                    print("how did I get here? where am i? who are you?")
+                    break
+
+    print("~~~~~ Final Hands ~~~~~")        
     player.show()
     dealer.show()
 
