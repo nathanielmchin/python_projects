@@ -169,7 +169,7 @@ def play_blackjack():
     if player.get_hand_value() == 21:
         # also need to implement insurance for here
         if dealer.get_hand_value() == 21:
-            return "Push"
+            pass
         else:
             while dealer.get_hand_value() < 21:
                 dealer.draw_card(deck)
@@ -181,28 +181,36 @@ def play_blackjack():
                 pass # exit this logic and evaluate the hands. the player should lose
         if dealer.get_hand_value() < 21:
             response = None
+            disable_double = False
             while player.get_hand_value() < 21 and response != '3':
-                response = input("(1) hit, (2) double, (3) stand: ") # player should not be able to double down after hitting. also need to incorporate splitting at some point.
-                if response == '1':
-                    player.draw_card(deck)
-                    player.show()
-                elif response == '2':
-                    player.draw_card(deck)
-                    player.show()
-                    break
-            # Dealer hits soft serves
-            while dealer.get_hand_value() <= 17:
-                if dealer.get_hand_value() == 17:
-                    if dealer.find_card('Ace') == True:
-                        dealer.draw_card(deck)
-                    else:
+                if disable_double == False:
+                    response = input("(1) hit, (2) double, (3) stand: ")# also need to incorporate splitting at some point.
+                    if response == '2':
+                        player.draw_card(deck)
+                        player.show()
                         break
-                if dealer.get_hand_value() < 17:
-                    dealer.draw_card(deck)
-                    print({dealer.show()})
-                else: 
-                    print("how did I get here? where am i? who are you?")
-                    break
+                else:
+                    response = input("(1) hit or (3) stand: ") 
+                if response == '1':
+                    disable_double = True
+                    player.draw_card(deck)
+                    player.show()
+            if player.get_hand_value() > 21: # the dealer does not hit if the player busts
+                pass
+            else:
+                # Dealer's turn. Dealer hits soft serves
+                while dealer.get_hand_value() <= 17:
+                    if dealer.get_hand_value() == 17:
+                        if dealer.find_card('Ace') == True:
+                            dealer.draw_card(deck)
+                        else:
+                            break
+                    if dealer.get_hand_value() < 17:
+                        dealer.draw_card(deck)
+                        print({dealer.show()})
+                    else: 
+                        print("how did I get here? where am i? who are you?")
+                        break
 
     print("~~~~~ Final Hands ~~~~~")        
     player.show()
