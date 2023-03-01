@@ -58,12 +58,9 @@ class Card():
 class Deck():
     def __init__(self):
         self._cards = []
-    # def build(self, deck_template): # python does not support function overloading 
-    #     for suit in ['Clubs', 'Hearts', 'Spades', 'Diamonds']:
-    #         for dt in deck_template:
-    #             card = Card(dt, suit, deck_template[dt])
-    #             self._cards.append(card)
-    def build(self, deck_template, num):
+        self.build()
+
+    def build(self, deck_template, num = 1):
         for i in range(num):
             for suit in ['Clubs', 'Hearts', 'Spades', 'Diamonds']:
                 for dt in deck_template:
