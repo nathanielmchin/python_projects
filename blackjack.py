@@ -32,6 +32,11 @@ deck_template_Aced = {
     ,'King'  : 10
 }
 
+deck_template_17 = {
+    't'   : 10
+    ,'17'   : 7
+}
+
 class Card():
     def __init__(self, code, suit, value):
         self._code = code
@@ -97,11 +102,16 @@ class Player():
         print("{} has a value of: {}".format(self._name, self.get_hand_value()))
         self.show_hand()
     
-    # def get_card(self, i):
-    #     if i >= (len(self._cards) - 1) or i < 0:
-    #         return None
-    #     else:
-    #         return self._cards[i]
+    def get_card(self, i):
+        if i >= (len(self._cards) - 1) or i < 0:
+            return None
+        else:
+            return self._cards[i]
+    def find_card(self, name):
+        for i in range(len(self._cards)):
+            if name == self._cards[i].get_code():
+                return True
+        return False
     def get_hand_value(self):
         sum = 0
         ace_count = 0
@@ -138,7 +148,7 @@ def play_blackjack():
     
     # Create the deck
     deck = Deck()
-    deck.build(deck_template_Aced, 5)
+    deck.build(deck_template_17, 5)
     deck.shuffle()
 
     dealer = Player("Dealer")
@@ -149,19 +159,47 @@ def play_blackjack():
     dealer.draw_card(deck)
     player.draw_card(deck)
 
+    player.show()
+    dealer.show_card(0)
+
     if player.get_hand_value() == 21:
+        # also need to implement insurance for here
         if dealer.get_hand_value() == 21:
             return "Push"
         else:
             while dealer.get_hand_value() < 21:
                 dealer.draw_card(deck)
-    # elif player.get_hand_value() < 21:
-    #     if dealer.
-
+    elif player.get_hand_value() < 21:
+        if dealer.get_card(0).get_value() == 11:
+            # offer insurance
+            pass
+        elif dealer.get_hand_value() == 21:
+            return "Dealer"
+        elif dealer.get_hand_value() < 21:
+            response = None
+            while player.get_hand_value() < 21 and response != '3':
+                response = input("(1) hit, (2) double, (3) stand: ")
+                if response == '1':
+                    player.draw_card(deck)
+                    player.show()
+                elif response == '2':
+                    player.draw_card(deck)
+                    player.show()
+                    break
+            print("testing")
+            while dealer.get_hand_value() <= 17:
+                if dealer.find_card('Ace') == True and dealer.get_hand_value() == 17:
+                    dealer.draw_card(deck)
+                else:
+                    break
+                if dealer.get_hand_value() < 17:
+                    dealer.draw_card(deck)
+                    break
+            
     player.show()
-    dealer.show_card(0)
+    dealer.show()
 
-    evaluate_winner(player, dealer)
+    # evaluate_winner(player, dealer)
 
 play_blackjack()
 
