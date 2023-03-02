@@ -1,5 +1,4 @@
 import random
-import time
 
 deck_template_standard = {
     'Ace'   : 11
@@ -15,27 +14,6 @@ deck_template_standard = {
     ,'Jack'  : 10
     ,'Queen' : 10
     ,'King'  : 10
-}
-
-deck_template_Aced = {
-    'Ace'   : 11
-    ,'Ace'   : 11
-    ,'Ace'   : 11
-    ,'Ace'   : 11
-    ,'Ace'   : 11
-    ,'Ace'   : 11
-    ,'Ace'   : 11
-    ,'Ace'   : 11
-    ,'Ace'   : 11
-    ,'Ace'   : 11
-    ,'Ace'   : 11
-    ,'Ace'   : 11
-    ,'King'  : 10
-}
-
-deck_template_17 = {
-    't'   : 10
-    ,'17'   : 7
 }
 
 class Card():
@@ -66,6 +44,8 @@ class Deck():
                 for dt in deck_template:
                     card = Card(dt, suit, deck_template[dt])
                     self._cards.append(card)
+    def count(self):
+        return len(self._cards)
     def show(self):
         for i in range(len(self._cards)):
             self._cards[i].show()
@@ -90,7 +70,7 @@ class Player():
         if i >= (len(self._cards) - 1) or i < 0:
             return None
         else:
-            print("{} has an upcard of".format(self._name))
+            print("{} has an upcard of {}".format(self._name, self._cards[i].get_value()))
             self._cards[i].show() 
     def show(self):
         print("{} has a value of: {}".format(self._name, self.get_hand_value()))
@@ -122,102 +102,131 @@ class Player():
         return sum
 
 def play_blackjack():
-    
     # Method for evaluating the winner of a round of blackjack
     def evaluate_winner(player, dealer):
         if player.get_hand_value() > 21 and dealer.get_hand_value() > 21: # this should never happen, right? the dealer wouldn't hit if the player already busts
-            return "Dealer"
+            return -1
         elif player.get_hand_value() > 21 and dealer.get_hand_value() <= 21: # player busts
-            return "Dealer"
+            return -1
         elif player.get_hand_value() <= 21 and dealer.get_hand_value() > 21: # dealer busts
-            return "Player"
+            return 1
         elif player.get_hand_value() <= 21 and dealer.get_hand_value() <= 21: # neither bust
             if player.get_hand_value() > dealer.get_hand_value():
-                return "Player"
+                return 1
             elif player.get_hand_value() < dealer.get_hand_value():
-                return "Dealer"
+                return -1
             elif player.get_hand_value() == dealer.get_hand_value():
-                return "Push"
+                return 0
             else:
                 return "Where are we (inner)?"
         else:
             return "Where are we (outer)?"
     
-    # Create the deck
-    deck = Deck()
-    deck.build(deck_template_standard, 5)
-    deck.shuffle()
-
-    # Create the players/Dealer
-    dealer = Player("Dealer")
-    player = Player("Player1")
-    
-    # The game begins!
-    # Both, the player and the dealer draw 2 cards.
-    player.draw_card(deck)
-    dealer.draw_card(deck)
-    player.draw_card(deck)
-    dealer.draw_card(deck)
-
-    # Reveal the drawn cards, 2 for the player and an upcard for the dealer
-    player.show()
-    dealer.show_card()
-
-    # Decision time, based on the drawn and shown cards
-    # if dealer.get_card().get_value() == 11:
-    #     # offer insurance
-    if player.get_hand_value() == 21:
-        # also need to implement insurance for here
-        if dealer.get_hand_value() == 21:
-            pass # i wonder if this works.
-        else:
-            while dealer.get_hand_value() < 21:
-                dealer.draw_card(deck)
-    elif player.get_hand_value() < 21:
-        if dealer.get_card(0).get_value() == 11:
-            # offer insurance
-            print('would offer insurance to you but o well.')
+    def evaluate_hands(player, dealer):
+        # Decision time, based on the drawn and shown cards
+        # if dealer.get_card().get_value() == 11:
+        #     # offer insurance
+        if player.get_hand_value() == 21:
+            # also need to implement insurance for here
             if dealer.get_hand_value() == 21:
-                pass # exit this logic and evaluate the hands. the player should lose. I wonder if this works.
-        if dealer.get_hand_value() < 21:
-            response = None
-            disable_double = False
-            while player.get_hand_value() < 21 and response != '3':
-                if disable_double == False:
-                    response = input("(1) hit, (2) double, (3) stand: ")# also need to incorporate splitting at some point.
-                    if response == '2':
+                pass # i wonder if this works.
+            else:
+                while dealer.get_hand_value() < 21:
+                    dealer.draw_card(deck)
+        elif player.get_hand_value() < 21:
+            if dealer.get_card(0).get_value() == 11:
+                # offer insurance
+                print('would offer insurance to you but o well.')
+                if dealer.get_hand_value() == 21:
+                    pass # exit this logic and evaluate the hands. the player should lose. I wonder if this works.
+            if dealer.get_hand_value() < 21:
+                response = None
+                disable_double = False
+                while player.get_hand_value() < 21 and response != '3':
+                    if disable_double == False:
+                        response = input("(1) hit, (2) double, (3) stand: ")# also need to incorporate splitting at some point.
+                        if response == '2':
+                            player.draw_card(deck)
+                            player.show()
+                            break
+                    else:
+                        response = input("(1) hit or (3) stand: ") 
+                    if response == '1':
+                        disable_double = True
                         player.draw_card(deck)
                         player.show()
-                        break
+                        dealer.show_card()
+                # The dealer does not hit if the player busts
+                if player.get_hand_value() > 21: 
+                    pass
                 else:
-                    response = input("(1) hit or (3) stand: ") 
-                if response == '1':
-                    disable_double = True
-                    player.draw_card(deck)
-                    player.show()
-            # The dealer does not hit if the player busts
-            if player.get_hand_value() > 21: 
-                pass
-            else:
-                # Dealer's turn. Dealer hits soft serves
-                while dealer.get_hand_value() <= 17:
-                    if dealer.get_hand_value() == 17:
-                        if dealer.find_card('Ace') == True:
+                    # Dealer's turn. Dealer hits soft serves
+                    while dealer.get_hand_value() <= 17:
+                        if dealer.get_hand_value() == 17:
+                            if dealer.find_card('Ace') == True:
+                                dealer.draw_card(deck)
+                            else:
+                                break
+                        if dealer.get_hand_value() < 17:
                             dealer.draw_card(deck)
-                        else:
+                            print({dealer.show()})
+                        else: 
+                            print("how did I get here? where am i? who are you?")
                             break
-                    if dealer.get_hand_value() < 17:
-                        dealer.draw_card(deck)
-                        print({dealer.show()})
-                    else: 
-                        print("how did I get here? where am i? who are you?")
-                        break
+    
+    play = True
+    # Create the deck
+    deck = Deck()
+    deck.build(deck_template_standard, 1)
+    deck.shuffle()
+    deck.shuffle()
 
-    print("~~~~~ Final Hands ~~~~~")        
-    player.show()
-    dealer.show()
+    wins_count = 0
+    loss_count = 0
+    ties_count = 0
 
-    print(evaluate_winner(player, dealer))
+    while play == True and deck.count() > 30: 
+        # Create the players/Dealer
+        dealer = Player("Dealer")
+        player = Player("Player1")
+        
+        # The game begins!
+        # Both, the player and the dealer draw 2 cards.
+        player.draw_card(deck)
+        dealer.draw_card(deck)
+        player.draw_card(deck)
+        dealer.draw_card(deck)
+        # Reveal the drawn cards, 2 for the player and an upcard for the dealer
+        player.show()
+        dealer.show_card()
+
+        # Evaluate the player hands and dealer hands
+        evaluate_hands(player, dealer)
+
+        # Provide the final result
+        print("~~~~~ Final Hands ~~~~~")        
+        player.show()
+        dealer.show()
+
+        if evaluate_winner(player, dealer) == 1:
+            wins_count += 1
+            print("~~~Winner is: The Player")
+        elif evaluate_winner(player, dealer) == -1:
+            loss_count += 1
+            print("~~~Winner is: The Dealer")
+        elif evaluate_winner(player, dealer) == 0:
+            ties_count += 1
+            print("~~~It's a tie!")
+        else:
+            print("I don't know what's happening")
+
+        response = input("Would you like to continue playing? (Enter)Yes (any input)No: ")
+        print("\n")
+        if response != '':
+            play = False
+    print(f"Total wins: {wins_count}")
+    print(f"Total loss: {loss_count}")
+    print(f"Total ties: {ties_count}")
 
 play_blackjack()
 
