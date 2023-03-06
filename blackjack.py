@@ -22,84 +22,108 @@ class Card():
         self._suit = suit
         self._value = value
     
-    # def get_card(self):
-    #     return [self._code, self._suit, self._value]
-    def get_code(self):
+    @property
+    def code(self):
         return self._code
-    def get_suit(self):
+    @property
+    def suit(self):
         return self._suit
-    def get_value(self):
+    @property
+    def value(self):
         return self._value
     
+    # show
     def show(self):
-        print(f"{[self._code, self._suit, self._value]}")
+        print(f"{[self.code, self.suit, self.value]}")
 
 class Deck():
     def __init__(self):
         self._cards = []
+    
+    @property
+    def cards(self):
+        return self._cards
 
     def build(self, deck_template, num = 1):
         for i in range(num):
             for suit in ['Clubs', 'Hearts', 'Spades', 'Diamonds']:
                 for dt in deck_template:
                     card = Card(dt, suit, deck_template[dt])
-                    self._cards.append(card)
-    def count(self):
-        return len(self._cards)
-    def show(self):
-        for i in range(len(self._cards)):
-            self._cards[i].show()
+                    self.cards.append(card)
     def shuffle(self):
-        for i in range(len(self._cards) - 1, 0, -1):
+        for i in range(len(self.cards) - 1, 0, -1):
             r = random.randint(0, i)
-            self._cards[i], self._cards[r] = self._cards[r], self._cards[i]
-        
+            self.cards[i], self.cards[r] = self.cards[r], self.cards[i]
+    def count(self):
+        return len(self.cards)
+
+    # show
+    def show(self):
+        for i in range(len(self.cards)):
+            self.cards[i].show()
+
 # This model does not support splits. we would need to implement multiple hands
 class Player(): 
     def __init__(self, name):
         self._name = name
         self._cards = []
 
+    @property
+    def name(self):
+        return self._name
+    @property
+    def cards(self):
+        return self._cards
+
     def draw_card(self, deck):
-        self._cards.append(deck._cards.pop())
-    
+        self.cards.append(deck.cards.pop())
+    def has_card(self, name):
+        for i in range(len(self.cards)):
+            if name == self.cards[i].code:
+                return True
+        return False
+
+    # show
     def show_hand(self):
-        for i in range(len(self._cards)):
-            self._cards[i].show()
+        for i in range(len(self.cards)):
+            self.cards[i].show()
     def show_card(self, i = 0):
-        if i >= (len(self._cards) - 1) or i < 0:
+        if i >= (len(self.cards) - 1) or i < 0:
             return None
         else:
-            print("{} has an upcard of {}".format(self._name, self._cards[i].get_value()))
-            self._cards[i].show() 
+            self.cards[i].show() 
     def show(self):
         print("{} has a value of: {}".format(self._name, self.get_hand_value()))
         self.show_hand()
     
+    # get
     def get_card(self, i):
-        if i >= (len(self._cards) - 1) or i < 0:
+        if i >= (len(self.cards) - 1) or i < 0:
             return None
         else:
-            return self._cards[i]
-    def find_card(self, name):
-        for i in range(len(self._cards)):
-            if name == self._cards[i].get_code():
-                return True
-        return False
+            return self.cards[i]
+    
     def get_hand_value(self):
         sum = 0
         ace_count = 0
-        for i in range(len(self._cards)):
+        for i in range(len(self.cards)):
             if self._cards[i]._code == 'Ace':
                 ace_count += 1
-            # print(f"looking at card:") 
-            # self._cards[i].show()
-            sum += self._cards[i].get_value()
+            sum += self.cards[i].value
         # Subtract 10 for each ace until the count is below 21 or until were out of Aces to subtract
         for i in range(ace_count):
             if sum > 21:
                 sum -= 10
         return sum
+
+class BJ_Dealer(Player):
+    def __init__(self):
+        super().__init__("Dealer")
+    
+    def show_upcard(self):
+        card = super().get_card(0)
+        print("Dealer has an upcard value of: {}".format(card.value))
+        super().show_card(0) 
 
 def play_blackjack():
     # Method for evaluating the winner of a round of blackjack
@@ -134,7 +158,7 @@ def play_blackjack():
                 while dealer.get_hand_value() < 21:
                     dealer.draw_card(deck)
         elif player.get_hand_value() < 21:
-            if dealer.get_card(0).get_value() == 11:
+            if dealer.get_card(0).value == 11:
                 # offer insurance
                 print('would offer insurance to you but o well.')
                 if dealer.get_hand_value() == 21:
@@ -155,7 +179,7 @@ def play_blackjack():
                         disable_double = True
                         player.draw_card(deck)
                         player.show()
-                        dealer.show_card()
+                        dealer.show_upcard()
                 # The dealer does not hit if the player busts
                 if player.get_hand_value() > 21: 
                     pass
@@ -163,7 +187,7 @@ def play_blackjack():
                     # Dealer's turn. Dealer hits soft serves
                     while dealer.get_hand_value() <= 17:
                         if dealer.get_hand_value() == 17:
-                            if dealer.find_card('Ace') == True:
+                            if dealer.has_card('Ace') == True:
                                 dealer.draw_card(deck)
                             else:
                                 break
@@ -187,7 +211,7 @@ def play_blackjack():
 
     while play == True and deck.count() > 30: 
         # Create the players/Dealer
-        dealer = Player("Dealer")
+        dealer = BJ_Dealer()
         player = Player("Player1")
         
         # The game begins!
@@ -198,7 +222,7 @@ def play_blackjack():
         dealer.draw_card(deck)
         # Reveal the drawn cards, 2 for the player and an upcard for the dealer
         player.show()
-        dealer.show_card()
+        dealer.show_upcard()
 
         # Evaluate the player hands and dealer hands
         evaluate_hands(player, dealer)
